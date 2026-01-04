@@ -1,0 +1,256 @@
+--// SNTS FREE HUB
+-- SLUZ
+-- WIM
+-- KOGORO
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Parent GUI safely
+local parent = (gethui and gethui()) or game:GetService("CoreGui")
+if parent:FindFirstChild("SNTS") then
+    parent.SNTS_GUI:Destroy()
+end
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "707_GUI"
+gui.ResetOnSpawn = false
+gui.Parent = parent
+
+-- Main Frame
+local main = Instance.new("Frame")
+main.Name = "Main"
+main.Size = UDim2.new(0, 700, 0, 400)
+main.Position = UDim2.new(0.5, -350, -1, 0)
+main.BackgroundColor3 = Color3.fromRGB(0,0,0)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = true
+main.Parent = gui
+
+-- Title
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -40, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 5)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.Text = "707 MAIN HUB"
+title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextSize = 18
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = main
+
+-- Credit 
+local credit = Instance.new("TextLabel")
+credit.Size = UDim2.new(0, 200, 0, 20)
+credit.Position = UDim2.new(1, -280, 0, 10)
+credit.BackgroundTransparency = 1
+credit.Font = Enum.Font.SourceSansItalic
+credit.Text = "Made by 707"
+credit.TextColor3 = Color3.fromRGB(200,200,200)
+credit.TextSize = 14
+credit.TextXAlignment = Enum.TextXAlignment.Right
+credit.Parent = main
+
+
+-- SIDE BUTTON
+local collapse = Instance.new("P")
+collapse.Size = UDim2.new(0, 25, 0, 25)
+collapse.Position = UDim2.new(1, -30, 0, 5)
+collapse.BackgroundColor3 = Color3.fromRGB(20,20,20)
+collapse.Font = Enum.Font.SourceSansBold
+collapse.Text = "<"
+collapse.TextSize = 18
+collapse.TextColor3 = Color3.fromRGB(255,255,255)
+collapse.Parent = main
+
+-- LEFT SIDEBAR
+local left = Instance.new("Frame")
+left.Size = UDim2.new(0, 180, 1, -40)
+left.Position = UDim2.new(0, 10, 0, 40)
+left.BackgroundColor3 = Color3.fromRGB(10,10,10)
+left.BorderSizePixel = 0
+left.Parent = main
+
+local leftScroll = Instance.new("ScrollingFrame")
+leftScroll.Size = UDim2.new(1, -10, 1, -10)
+leftScroll.Position = UDim2.new(0, 5, 0, 5)
+leftScroll.BackgroundTransparency = 1
+leftScroll.ScrollBarThickness = 6
+leftScroll.CanvasSize = UDim2.new(0,0,0,0)
+leftScroll.Parent = left
+
+local leftLayout = Instance.new("UIListLayout")
+leftLayout.Padding = UDim.new(0, 8)
+leftLayout.SortOrder = Enum.SortOrder.LayoutOrder
+leftLayout.Parent = leftScroll
+
+-- AUTOMATIC MAG RERESIZE YUNG SCROLL BAR
+leftLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    leftScroll.CanvasSize = UDim2.new(0, 0, 0, leftLayout.AbsoluteContentSize.Y + 10)
+end)
+
+-- PROFILE
+local profile = Instance.new("Frame")
+profile.Size = UDim2.new(1,0,0,60)
+profile.BackgroundTransparency = 1
+profile.Parent = leftScroll
+
+local avatar = Instance.new("ImageLabel")
+avatar.Size = UDim2.new(0,50,0,50)
+avatar.Position = UDim2.new(0,5,0,5)
+avatar.BackgroundTransparency = 1
+avatar.ClipsDescendants = true
+avatar.Parent = profile
+
+-- HEADSHOT
+local avatarCorner = Instance.new("UICorner")
+avatarCorner.CornerRadius = UDim.new(1,0)
+avatarCorner.Parent = avatar
+
+if LocalPlayer and LocalPlayer.UserId then
+    avatar.Image = ("rbxthumb://type=AvatarHeadShot&id=%d&w=150&h=150"):format(LocalPlayer.UserId)
+end
+
+local nameLabel = Instance.new("TextLabel")
+nameLabel.Size = UDim2.new(1, -60, 0, 25)
+nameLabel.Position = UDim2.new(0,60,0,5)
+nameLabel.BackgroundTransparency = 1
+nameLabel.Font = Enum.Font.SourceSansBold
+nameLabel.TextColor3 = Color3.new(1,1,1)
+nameLabel.TextSize = 16
+nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+nameLabel.Text = "👤 " .. LocalPlayer.Name
+nameLabel.Parent = profile
+
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(1, -60, 0, 20)
+status.Position = UDim2.new(0,60,0,30)
+status.BackgroundTransparency = 1
+status.Font = Enum.Font.SourceSans
+status.TextColor3 = Color3.fromRGB(0,255,0)
+status.TextSize = 14
+status.TextXAlignment = Enum.TextXAlignment.Left
+status.Text = "🟢 Online"
+status.Parent = profile
+
+-- RIGHT SIDE
+local right = Instance.new("Frame")
+right.Size = UDim2.new(1, -210, 1, -40)
+right.Position = UDim2.new(0,200,0,40)
+right.BackgroundTransparency = 1
+right.Parent = main
+
+local tabs = {}
+local currentTab = nil
+
+-- FOR NEW TAB
+local function createTab(name)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1,0,0,25)
+    btn.BackgroundTransparency = 1
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextSize = 16
+    btn.Text = name
+    btn.Parent = leftScroll
+
+    local scroll = Instance.new("ScrollingFrame")
+    scroll.Size = UDim2.new(1,0,1,0)
+    scroll.BackgroundTransparency = 1
+    scroll.ScrollBarThickness = 6
+    scroll.CanvasSize = UDim2.new(0,0,0,0)
+    scroll.Visible = false
+    scroll.Parent = right
+
+    local layout = Instance.new("UIListLayout")
+    layout.Padding = UDim.new(0,8)
+    layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Parent = scroll
+
+    -- AUTOMATIC MAG RERESIZE YUNG SCROLL BAR
+    layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        scroll.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
+    end)
+
+    tabs[name] = {frame = scroll, layout = layout}
+
+    btn.MouseButton1Click:Connect(function()
+        for _, v in pairs(tabs) do
+            v.frame.Visible = false
+        end
+        scroll.Visible = true
+        currentTab = name
+    end)
+
+    if not currentTab then
+        currentTab = name
+        scroll.Visible = true
+    end
+end
+
+-- BUTTONS
+local function button(tabName, text, url)
+    if not tabs[tabName] then return end
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.8,0,0,25)
+    btn.BackgroundTransparency = 1
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextSize = 16
+    btn.Text = text
+    btn.Parent = tabs[tabName].frame
+
+    btn.MouseButton1Click:Connect(function()
+        local success, result = pcall(function()
+            return game:HttpGet(url)
+        end)
+        if success and result then
+            loadstring(result)()
+        else
+            warn("Failed to load script from: "..url)
+        end
+    end)
+end
+
+-- DITO MO ILALAGAY UNG MGA URL NG CHEAT MO DAPAT RAW DITO KARIN GAGAWA NG MGA TABS AND BUTTON
+createTab("FANTASMA")
+button("FANTASMA", "AIMBOT", "https://raw.githubusercontent.com/usbkillerx/EZhacker/refs/heads/main/EZhack")
+
+
+createTab("URBAN CITY RP")
+button("URBAN CITY RP", "AIMBOT + ESP", "https://gist.githubusercontent.com/thanhhdao322/6fed21a5fd0e749e46a4aa705b086bd6/raw/9cd8b1ece36a9cfdd39768ff54a8d4884538bbfb/mainv3.lua")
+button("URBAN CITY RP", "HITBOX EXPANDER", "https://raw.githubusercontent.com/ottokizaki/main-turok/refs/heads/main/hitbox%20expander")
+button("URBAN CITY RP", "FULL ARMOR", "https://raw.githubusercontent.com/ottokizaki/main-turok/refs/heads/main/oxy")
+
+
+createTab("OTHERS")
+button("OTHERS", "InfiniteYield", "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+button("OTHERS", "DECALS SPAM", "https://pastebin.com/raw/SQg7gBB5")
+button("OTHERS", "SKY SET", "https://pastebin.com/raw/6JSLptY3")
+button("OTHERS", "AIM VIEWER", "https://raw.githubusercontent.com/Nosssa/NossLock/main/VinGUI")
+button("OTHERS", "BRING ALL", "https://rawscripts.net/raw/Universal-Script-Bring-All-Client-Sided-Universal-36570")
+button("OTHERS", "JERK CHEAT", "https://pastebin.com/raw/FWwdST5Y")
+button("OTHERS", "FLING CHEAT", "https://rawscripts.net/raw/Universal-Script-fe-fling-gui-8018")
+button("OTHERS", "UNIVERSAL ESP", "https://pastebin.com/raw/VHxcBx4j")
+button("OTHERS", "TOUCH FLING", "https://pastebin.com/raw/LgZwZ7ZB")
+button("OTHERS", "GRAB TOOLS", "https://pastebin.com/raw/qDVxCpmp")
+
+
+-- SIDE BUTTON
+local collapsed = false
+collapse.MouseButton1Click:Connect(function()
+    collapsed = not collapsed
+    if collapsed then
+        TweenService:Create(main, TweenInfo.new(0.3), {Size = UDim2.new(0,200,0,400)}):Play()
+        collapse.Text = ">"
+    else
+        TweenService:Create(main, TweenInfo.new(0.3), {Size = UDim2.new(0,700,0,400)}):Play()
+        collapse.Text = "<"
+    end
+end)
+
+-- SLIDE ANIMATION
+TweenService:Create(main, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -350, 0.1, 0)}):Play()
